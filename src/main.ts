@@ -9,6 +9,7 @@ import { AppModule } from './app.module';
 import { TransformInterceptor } from './core/interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './core/filter/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +21,20 @@ async function bootstrap() {
   // 校验请求管道
   app.useGlobalPipes(new ValidationPipe());
 
+  initSwaggerModule(app);
+
   await app.listen(3000);
 }
 bootstrap();
+
+// 设置swagger文档
+function initSwaggerModule(app) {
+  const config = new DocumentBuilder()
+    .setTitle('管理后台')
+    .setDescription('管理后台接口文档')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+}

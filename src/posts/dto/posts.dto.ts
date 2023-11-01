@@ -5,14 +5,18 @@
  * @Description:
  */
 
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreatePostDto {
-  @IsNotEmpty({ message: '文章标题必填' })
+  @ApiProperty({ description: '标题' })
+  @IsNotEmpty({ message: '文章标题不能为空' })
   readonly title: string;
 
-  @IsNotEmpty({ message: '缺少作者信息' })
+  @ApiProperty({ description: '作者' })
+  @IsNotEmpty({ message: '作者不能为空' })
   readonly author: string;
 
+  @ApiPropertyOptional({ description: '内容' })
   readonly content: string;
 }

@@ -16,8 +16,19 @@ export class PostsService {
     private readonly postsRepository: Repository<PostsEntity>,
   ) {}
 
-  getList() {
-    return [];
+  async findAll(query = { pageNum: 1, pageSize: 10 }) {
+    const db = this.postsRepository.createQueryBuilder('posts');
+    db.where('1 = 1');
+    db.orderBy('posts.create_time', 'DESC');
+
+    const total = await db.getCount();
+    const { pageNum, pageSize } = query;
+    db.limit(pageSize);
+    db.offset(pageSize * (pageNum - 1));
+
+    const items = await db.getMany();
+
+    return { items, total };
   }
 
   async create(post: Partial<PostsEntity>): Promise<PostsEntity> {

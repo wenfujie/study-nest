@@ -17,7 +17,7 @@ export class PostsController {
   @ApiOperation({ summary: '获取文章列表' })
   @Get('query')
   getList() {
-    return this.postsService.getList();
+    return this.postsService.findAll();
   }
 
   @ApiOperation({ summary: '新增文章' })

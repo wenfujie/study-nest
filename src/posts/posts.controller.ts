@@ -22,8 +22,7 @@ export class PostsController {
 
   @ApiOperation({ summary: '新增文章' })
   @Post('add')
-  create(@Body() dto: CreatePostDto) {
-    const { title } = dto;
-    return 'title是' + title;
+  create(@Body() body: CreatePostDto) {
+    return this.postsService.create(body);
   }
 }

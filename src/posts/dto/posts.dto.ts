@@ -5,7 +5,7 @@
  * @Description:
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { XPageDTO } from '../../common/common.dto';
 
@@ -20,6 +20,13 @@ export class CreatePostDto {
 
   @ApiPropertyOptional({ description: '内容' })
   readonly content: string;
+}
+
+export class UpdatePostDto extends PartialType(CreatePostDto) {
+  @ApiProperty({ description: '文章id' })
+  @IsNotEmpty({ message: '文章id不能为空' })
+  @IsString({ message: '参数类型错误' })
+  readonly id: string;
 }
 
 export class FindAllDto extends XPageDTO {

@@ -6,7 +6,12 @@
  */
 import { Body, Controller, Post } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto, FindAllDto, FindOneDto } from './dto/posts.dto';
+import {
+  CreatePostDto,
+  FindAllDto,
+  FindOneDto,
+  UpdatePostDto,
+} from './dto/posts.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('文章管理')
@@ -30,5 +35,11 @@ export class PostsController {
   @Post('Add')
   create(@Body() params: CreatePostDto) {
     return this.postsService.create(params);
+  }
+
+  @ApiOperation({ summary: '修改文章' })
+  @Post('Update')
+  update(@Body() params: UpdatePostDto) {
+    return this.postsService.update(params);
   }
 }

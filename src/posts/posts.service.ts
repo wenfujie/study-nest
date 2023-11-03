@@ -8,7 +8,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostsEntity } from './posts.entity';
-import { FindAllDto } from './dto/posts.dto';
+import { FindAllDto, UpdatePostDto } from './dto/posts.dto';
 import { PageResultPromise } from '../common/common.dto';
 
 @Injectable()
@@ -44,5 +44,12 @@ export class PostsService {
       throw new HttpException('文章已存在', 401);
     }
     return await this.postsRepository.save(post);
+  }
+
+  async update(data: UpdatePostDto) {
+    const { id, ...other } = data;
+    await this.findOne(id);
+    await this.postsRepository.update(id, other);
+    return;
   }
 }

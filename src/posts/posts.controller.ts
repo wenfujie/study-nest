@@ -4,9 +4,9 @@
  * @LastEditTime: 2023-11
  * @Description:
  */
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto } from './dto/posts.dto';
+import { CreatePostDto, FindAllDto } from './dto/posts.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('文章管理')
@@ -15,14 +15,14 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @ApiOperation({ summary: '获取文章列表' })
-  @Get('query')
-  getList() {
-    return this.postsService.findAll();
+  @Post('query')
+  getList(@Body() params: FindAllDto) {
+    return this.postsService.findAll(params);
   }
 
   @ApiOperation({ summary: '新增文章' })
   @Post('add')
-  create(@Body() body: CreatePostDto) {
-    return this.postsService.create(body);
+  create(@Body() params: CreatePostDto) {
+    return this.postsService.create(params);
   }
 }

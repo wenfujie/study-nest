@@ -8,6 +8,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import {
   CreatePostDto,
+  DeleteBatchDto,
   FindAllDto,
   FindOneDto,
   UpdatePostDto,
@@ -41,5 +42,11 @@ export class PostsController {
   @Post('Update')
   update(@Body() params: UpdatePostDto) {
     return this.postsService.update(params);
+  }
+
+  @ApiOperation({ summary: '批量删除文章' })
+  @Post('DeleteBatch')
+  deleteBatch(@Body() params: DeleteBatchDto) {
+    return this.postsService.deleteBatch(params.ids);
   }
 }

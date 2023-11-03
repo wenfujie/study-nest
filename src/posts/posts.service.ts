@@ -8,7 +8,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostsEntity } from './posts.entity';
-import { FindAllDto, UpdatePostDto } from './dto/posts.dto';
+import { DeleteBatchDto, FindAllDto, UpdatePostDto } from './dto/posts.dto';
 import { PageResultPromise } from '../common/common.dto';
 
 @Injectable()
@@ -51,5 +51,9 @@ export class PostsService {
     await this.findOne(id);
     await this.postsRepository.update(id, other);
     return;
+  }
+
+  async deleteBatch(ids: DeleteBatchDto['ids']) {
+    await this.postsRepository.delete(ids);
   }
 }

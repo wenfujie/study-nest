@@ -31,20 +31,11 @@ export class PostsService {
     return { items, total };
   }
 
-  // async findOne(query = { pageNum: 1, pageSize: 10 }) {
-  //   const db = this.postsRepository.createQueryBuilder('posts');
-  //   db.where('1 = 1');
-  //   db.orderBy('posts.create_time', 'DESC');
-
-  //   const total = await db.getCount();
-  //   const { pageNum, pageSize } = query;
-  //   db.limit(pageSize);
-  //   db.offset(pageSize * (pageNum - 1));
-
-  //   const items = await db.getMany();
-
-  //   return { items, total };
-  // }
+  async findOne(id: string) {
+    const record = await this.postsRepository.findOne({ where: { id } });
+    if (!record) throw new HttpException('文章不存在', 401);
+    return record;
+  }
 
   async create(post: Partial<PostsEntity>): Promise<PostsEntity> {
     const { title } = post;

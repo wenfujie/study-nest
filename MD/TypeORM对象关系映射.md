@@ -1,4 +1,8 @@
 
+## typeORM 对比 Prisma
+
+[prisma 官网对比说明](https://www.prisma.io/docs/concepts/more/comparisons/prisma-and-typeorm#typeorm-vs-prisma)
+
 
 |                  |             Prisma             |           TypeORM            |           Sequelize            |
 | ---------------- | :----------------------------: | :--------------------------: | :----------------------------: |

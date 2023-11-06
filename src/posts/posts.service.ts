@@ -7,6 +7,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Post } from '@prisma/client';
+import { PageResult } from '../common/common.dto';
 
 @Injectable()
 export class PostsService {
@@ -15,29 +16,13 @@ export class PostsService {
   async findAll(query: {
     skip?: number;
     take?: number;
-    cursor?: Prisma.PostWhereUniqueInput;
     where?: Prisma.PostWhereInput;
     orderBy?: Prisma.PostOrderByWithRelationInput;
-  }): Promise<Post[]> {
-    const { skip, take, cursor, where, orderBy } = query;
-    return this.prisma.post.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
-
-    // const { page = 1, pageSize = 10, title = '' } = query;
-    // const [items, total] = await this.postsRepository
-    //   .createQueryBuilder('posts')
-    //   .where('posts.title Like :title', { title: `%${title}%` })
-    //   .take(pageSize)
-    //   .skip(pageSize * (page - 1))
-    //   .orderBy('posts.create_time', 'DESC')
-    //   .getManyAndCount();
-
-    // return { items, total };
+  }): Promise<PageResult<Post>> {
+    const { where } = query;
+    const total = await this.prisma.post.count({ where });
+    const items = await this.prisma.post.findMany({ ...query });
+    return { items, total };
   }
 
   // async findOne(id: string) {

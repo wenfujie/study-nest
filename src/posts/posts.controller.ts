@@ -17,11 +17,15 @@ export class PostsController {
   @ApiOperation({ summary: '获取文章列表' })
   @Post('Query')
   findAll(@Body() body: FindAllDto) {
-    const { title, page, pageSize } = body;
-    this.postsService.findAll({
+    const { title = '', page = 1, pageSize = 10 } = body;
+
+    return this.postsService.findAll({
       take: pageSize,
       skip: (page - 1) * pageSize,
       where: { title: { contains: title } },
+      orderBy: {
+        createTime: 'desc',
+      },
     });
   }
 

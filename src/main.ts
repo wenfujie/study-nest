@@ -21,6 +21,8 @@ async function bootstrap() {
   // 校验请求管道
   app.useGlobalPipes(new ValidationPipe());
 
+  app.enableShutdownHooks();
+
   initSwaggerModule(app);
 
   await app.listen(3000);

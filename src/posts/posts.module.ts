@@ -7,12 +7,11 @@
 import { Module } from '@nestjs/common';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostsEntity } from './posts.entity';
+import { PrismaService } from '../prisma.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PostsEntity])],
+  imports: [],
   controllers: [PostsController],
-  providers: [PostsService],
+  providers: [PostsService, PrismaService],
 })
 export class PostsModule {}

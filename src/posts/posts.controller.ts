@@ -4,9 +4,9 @@
  * @LastEditTime: 2023-11
  * @Description:
  */
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpException, Post } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { FindAllDto } from './dto/posts.dto';
+import { CreatePostDto, FindAllDto, FindOneDto } from './dto/posts.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('文章管理')
@@ -29,17 +29,19 @@ export class PostsController {
     });
   }
 
-  // @ApiOperation({ summary: '获取文章详情' })
-  // @Post('QueryDetail')
-  // findOne(@Body() params: FindOneDto) {
-  //   return this.postsService.findOne(params.id);
-  // }
+  @ApiOperation({ summary: '获取文章详情' })
+  @Post('QueryDetail')
+  async findOne(@Body() params: FindOneDto) {
+    const record = await this.postsService.findOne(params);
+    if (!record) throw new HttpException('文章不存在', 401);
+    return record;
+  }
 
-  // @ApiOperation({ summary: '新增文章' })
-  // @Post('Add')
-  // create(@Body() params: CreatePostDto) {
-  //   return this.postsService.create(params);
-  // }
+  @ApiOperation({ summary: '新增文章' })
+  @Post('Add')
+  create(@Body() params: CreatePostDto) {
+    return this.postsService.create(params);
+  }
 
   // @ApiOperation({ summary: '修改文章' })
   // @Post('Update')

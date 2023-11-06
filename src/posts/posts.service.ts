@@ -4,7 +4,7 @@
  * @LastEditTime: 2023-11
  * @Description:
  */
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Post } from '@prisma/client';
 import { PageResult } from '../common/common.dto';
@@ -25,20 +25,22 @@ export class PostsService {
     return { items, total };
   }
 
-  // async findOne(id: string) {
-  //   const record = await this.postsRepository.findOne({ where: { id } });
-  //   if (!record) throw new HttpException('文章不存在', 401);
-  //   return record;
-  // }
+  async findOne(params: { id?: string; title?: string }) {
+    const { id, title } = params;
+    if (!id && !title) return;
+    return await this.prisma.post.findUnique({ where: { id, title } });
+  }
 
-  // async create(post: Partial<PostsEntity>): Promise<PostsEntity> {
-  //   const { title } = post;
-  //   const doc = await this.postsRepository.findOne({ where: { title } });
-  //   if (doc) {
-  //     throw new HttpException('文章已存在', 401);
-  //   }
-  //   return await this.postsRepository.save(post);
-  // }
+  async create(
+    post: Pick<Post, 'title' | 'author' | 'content'>,
+  ): Promise<Post> {
+    const { title } = post;
+    const record = await this.findOne({ title });
+
+    if (record) throw new HttpException('文章已存在', 401);
+
+    return await this.prisma.post.create({ data: post });
+  }
 
   // async update(data: UpdatePostDto) {
   //   const { id, ...other } = data;

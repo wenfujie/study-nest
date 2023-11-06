@@ -6,7 +6,13 @@
  */
 import { Body, Controller, HttpException, Post } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto, FindAllDto, FindOneDto } from './dto/posts.dto';
+import {
+  CreatePostDto,
+  DeleteBatchDto,
+  FindAllDto,
+  FindOneDto,
+  UpdatePostDto,
+} from './dto/posts.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('文章管理')
@@ -43,15 +49,15 @@ export class PostsController {
     return this.postsService.create(params);
   }
 
-  // @ApiOperation({ summary: '修改文章' })
-  // @Post('Update')
-  // update(@Body() params: UpdatePostDto) {
-  //   return this.postsService.update(params);
-  // }
+  @ApiOperation({ summary: '修改文章' })
+  @Post('Update')
+  update(@Body() params: UpdatePostDto) {
+    return this.postsService.update(params);
+  }
 
-  // @ApiOperation({ summary: '批量删除文章' })
-  // @Post('DeleteBatch')
-  // deleteBatch(@Body() params: DeleteBatchDto) {
-  //   return this.postsService.deleteBatch(params.ids);
-  // }
+  @ApiOperation({ summary: '批量删除文章' })
+  @Post('DeleteBatch')
+  deleteBatch(@Body() params: DeleteBatchDto) {
+    return this.postsService.deleteBatch(params.ids);
+  }
 }

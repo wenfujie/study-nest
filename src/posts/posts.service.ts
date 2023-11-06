@@ -8,6 +8,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Post } from '@prisma/client';
 import { PageResult } from '../common/common.dto';
+import { DeleteBatchDto, UpdatePostDto } from './dto/posts.dto';
 
 @Injectable()
 export class PostsService {
@@ -42,14 +43,25 @@ export class PostsService {
     return await this.prisma.post.create({ data: post });
   }
 
-  // async update(data: UpdatePostDto) {
-  //   const { id, ...other } = data;
-  //   await this.findOne(id);
-  //   await this.postsRepository.update(id, other);
-  //   return;
-  // }
+  async update(data: UpdatePostDto) {
+    const { id, ...other } = data;
+    const record = await this.findOne({ id });
 
-  // async deleteBatch(ids: DeleteBatchDto['ids']) {
-  //   await this.postsRepository.delete(ids);
-  // }
+    if (!record) throw new HttpException('文章不存在', 401);
+
+    return this.prisma.post.update({
+      where: { id },
+      data: other,
+    });
+  }
+
+  async deleteBatch(ids: DeleteBatchDto['ids']) {
+    return this.prisma.post.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
 }

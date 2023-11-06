@@ -8,32 +8,33 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+const posts = [
+  {
+    title: '文章1',
+    author: '张三',
+    content: 'We are excited to share that',
+  },
+  {
+    title: '文章2',
+    author: '李四',
+    content: '666',
+  },
+];
+
 async function main() {
+  const [post1, post2] = posts;
   // create two dummy articles
-  const post1 = await prisma.post.upsert({
-    where: { title: 'Prisma Adds Support for MongoDB' },
+  await prisma.post.upsert({
+    where: { title: post1.title },
     update: {},
-    create: {
-      id: '',
-      title: 'Prisma Adds Support for MongoDB',
-      author: '张三',
-      content:
-        "We are excited to share that today's Prisma ORM release adds stable support for MongoDB!",
-    },
+    create: post1,
   });
 
-  const post2 = await prisma.post.upsert({
-    where: { title: "What's new in Prisma? (Q1/22)" },
+  await prisma.post.upsert({
+    where: { title: post2.title },
     update: {},
-    create: {
-      title: "What's new in Prisma? (Q1/22)",
-      author: '李四',
-      content:
-        'Learn about everything in the Prisma ecosystem and community from January to March 2022.',
-    },
+    create: post2,
   });
-
-  console.log({ post1, post2 });
 }
 
 // execute the main function

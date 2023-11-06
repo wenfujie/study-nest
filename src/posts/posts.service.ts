@@ -8,7 +8,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Post } from '@prisma/client';
 import { PageResult } from '../common/common.dto';
-import { DeleteBatchDto, UpdatePostDto } from './dto/posts.dto';
+import { DeleteBatchDto, UpdatePostDto } from './posts.dto';
 
 @Injectable()
 export class PostsService {
@@ -55,7 +55,7 @@ export class PostsService {
     });
   }
 
-  async deleteBatch(ids: DeleteBatchDto['ids']) {
+  deleteBatch(ids: DeleteBatchDto['ids']) {
     return this.prisma.post.deleteMany({
       where: {
         id: {
@@ -63,5 +63,9 @@ export class PostsService {
         },
       },
     });
+  }
+
+  deleteAll() {
+    return this.prisma.post.deleteMany({});
   }
 }

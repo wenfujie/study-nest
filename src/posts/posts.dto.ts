@@ -7,7 +7,7 @@
 
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { ArrayMinSize, IsNotEmpty, IsString } from 'class-validator';
-import { XPageDTO } from '../../common/common.dto';
+import { XPageDTO } from '../common/common.dto';
 
 export class CreatePostDto {
   @ApiProperty({ description: '标题' })

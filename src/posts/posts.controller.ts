@@ -12,7 +12,7 @@ import {
   FindAllDto,
   FindOneDto,
   UpdatePostDto,
-} from './dto/posts.dto';
+} from './posts.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('文章管理')
@@ -59,5 +59,11 @@ export class PostsController {
   @Post('DeleteBatch')
   deleteBatch(@Body() params: DeleteBatchDto) {
     return this.postsService.deleteBatch(params.ids);
+  }
+
+  @ApiOperation({ summary: '删除所有文章' })
+  @Post('DeleteAll')
+  deleteAll() {
+    return this.postsService.deleteAll();
   }
 }

@@ -1,8 +1,6 @@
-
 ## typeORM 对比 Prisma
 
 [prisma 官网对比说明](https://www.prisma.io/docs/concepts/more/comparisons/prisma-and-typeorm#typeorm-vs-prisma)
-
 
 |                  |             Prisma             |           TypeORM            |           Sequelize            |
 | ---------------- | :----------------------------: | :--------------------------: | :----------------------------: |
@@ -12,4 +10,3 @@
 | **语法**         | 生成增强安全性的TypeScript类型 | 语法富有表达力，使用起来愉快 |           冗长的语法           |
 | **劣势**         |       相对较新且资源有限       |   对初学者来说学习曲线较陡   |      有限的TypeScript支持      |
 | **适合项目类型** |   适用于长期的TypeScript项目   |  适用于需要多样数据库的项目  |     适用于传统的数据库操作     |
-

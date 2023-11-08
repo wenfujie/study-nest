@@ -18,3 +18,11 @@ model Post {
   createTime DateTime @default(now())
   updateTime DateTime @updatedAt
 }
+
+model MenuItem {
+  id       Int       @id @default(autoincrement())
+  label    String
+  parent   MenuItem? @relation("ChildToParent", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId Int?
+  children MenuItem[] @relation("ChildToParent")
+}

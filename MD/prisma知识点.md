@@ -1,6 +1,5 @@
 - [prisma.scheme](#prismascheme)
-  - [Data model 数据模型](#data-model-数据模型)
-  - [model relation 模型关系](#model-relation-模型关系)
+  - [模型关系 model relation](#模型关系-model-relation)
     - [术语](#术语)
     - [关系类型](#关系类型)
     - [@relation](#relation)
@@ -13,9 +12,7 @@
 
 # prisma.scheme
 
-## Data model 数据模型
-
-## model relation 模型关系
+## 模型关系 model relation
 
 ### 术语
 

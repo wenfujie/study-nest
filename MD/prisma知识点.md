@@ -9,6 +9,7 @@
       - [显式多对多](#显式多对多)
       - [隐式多对多](#隐式多对多)
     - [参照动作](#参照动作)
+- [常用指令](#常用指令)
 
 # prisma.scheme
 
@@ -176,3 +177,23 @@ model Category {
 `参照动作` 即当删除、更新记录时，同时会对关联的数据进行操作。
 
 [参照动作](https://prisma.yoga/concepts/components/prisma-schema/relations/referential-actions)
+
+# 常用指令
+
+dev 环境
+
+```bash
+# 同步数据库（--name 指定文件夹名称）
+npx prisma migrate dev --name init
+
+# 重置数据库（自动运行种子脚本）
+npx prisma migrate reset
+
+```
+
+pro 环境
+
+```bash
+# 同步数据库
+npx prisma migrate deploy
+```

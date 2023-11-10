@@ -9,11 +9,11 @@ import { PostsService } from './posts.service';
 import {
   CreatePostDto,
   DeleteBatchDto,
-  FindAllDto,
   FindOneDto,
   UpdatePostDto,
 } from './posts.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { XPageDTO } from '../common/common.dto';
 
 @ApiTags('文章管理')
 @Controller('posts')
@@ -22,23 +22,19 @@ export class PostsController {
 
   @ApiOperation({ summary: '获取文章列表' })
   @Post('Query')
-  findAll(@Body() body: FindAllDto) {
-    const { title = '', page = 1, pageSize = 10 } = body;
+  findAll(@Body() body: XPageDTO) {
+    const { page = 1, pageSize = 10 } = body;
 
     return this.postsService.findAll({
       take: pageSize,
       skip: (page - 1) * pageSize,
-      where: { title: { contains: title } },
-      orderBy: {
-        createTime: 'desc',
-      },
     });
   }
 
   @ApiOperation({ summary: '获取文章详情' })
   @Post('QueryDetail')
-  async findOne(@Body() params: FindOneDto) {
-    const record = await this.postsService.findOne(params);
+  async findOne(@Body() data: FindOneDto) {
+    const record = await this.postsService.findOne(data.id);
     if (!record) throw new HttpException('文章不存在', 401);
     return record;
   }

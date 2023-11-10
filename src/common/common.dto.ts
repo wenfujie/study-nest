@@ -46,4 +46,4 @@ export interface PageResult<T = unknown> {
   total: number;
 }
 
-export type PageResultPromise = Promise<PageResult>;
+export type PageResultPromise<T> = Promise<PageResult<T>>;

@@ -22,19 +22,17 @@ const posts = [
 ];
 
 async function main() {
-  const [post1, post2] = posts;
-  // create two dummy articles
-  await prisma.post.upsert({
-    where: { title: post1.title },
-    update: {},
-    create: post1,
-  });
-
-  await prisma.post.upsert({
-    where: { title: post2.title },
-    update: {},
-    create: post2,
-  });
+  // const [post1, post2] = posts;
+  // await prisma.post.upsert({
+  //   where: { title: post1.title },
+  //   update: {},
+  //   create: post1,
+  // });
+  // await prisma.post.upsert({
+  //   where: { title: post2.title },
+  //   update: {},
+  //   create: post2,
+  // });
 }
 
 // execute the main function

@@ -316,7 +316,7 @@ app.useGlobalFilters(new HttpExceptionFilter());
 
 ## 1.6中间件、守卫、拦截器、管道、异常过滤器的执行顺序
 
-![](./images/nest执行顺序.png)
+![](./images/nest各模块执行顺序.png)
 
 **往细了说**
 

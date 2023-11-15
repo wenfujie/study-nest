@@ -4,7 +4,7 @@
  * @LastEditTime: 2023-11
  * @Description:
  */
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -26,10 +26,5 @@ export class AppController {
   async login(@Request() req) {
     // req.user 在 passport-local 身份验证流期间由 Passport 填充
     return this.authService.login(req.user);
-  }
-
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

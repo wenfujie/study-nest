@@ -14,6 +14,8 @@
   - [1.5异常过滤器](#15异常过滤器)
   - [1.6中间件、守卫、拦截器、管道、异常过滤器的执行顺序](#16中间件守卫拦截器管道异常过滤器的执行顺序)
   - [1.7自定义装饰器](#17自定义装饰器)
+    - [例子1：获取用户信息](#例子1获取用户信息)
+    - [例子2：记录状态](#例子2记录状态)
     - [结合管道使用](#结合管道使用)
     - [装饰器聚合](#装饰器聚合)
 - [2.其他](#2其他)
@@ -344,7 +346,7 @@ app.useGlobalFilters(new HttpExceptionFilter());
 
 > 自定义装饰器：用于封装一些常用操作，例如根据token返回用户信息、校验用户权限。
 
-封装获取用户信息的装饰器
+### 例子1：获取用户信息
 
 ```js
 // user.decorator.ts
@@ -363,6 +365,62 @@ export const User = createParamDecorator((data: unknown, ctx: ExecutionContext) 
 @Get()
 async findOne(@User() user: UserEntity) {
   console.log(user);
+}
+```
+
+### 例子2：记录状态
+
+> 在 Nest.js 中，Metadata 是通过装饰器来实现的，它包含了对应类、方法、属性和参数等的数据。而 Reflector 可以用于检索和解析这些元数据。
+
+实现 @Public 装饰器，作用是记录 `isPublic = true` 。
+
+```js
+import { SetMetadata } from '@nestjs/common';
+
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+```
+
+使用 @Public
+
+```js
+  @Public()
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login(@Request() req) {
+    // ...
+  }
+```
+
+之后就可以在管道、守卫里通过 `Reflector` 类读取 isPublic 来控制业务逻辑
+
+```js
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { AuthGuard } from '@nestjs/passport';
+import { IS_PUBLIC_KEY } from './auth.decorator';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private reflector: Reflector) {
+    super();
+  }
+
+  // 根据 @Public 判断是否激活
+  canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) {
+      return true;
+    }
+    return super.canActivate(context);
+  }
 }
 ```
 
@@ -394,7 +452,7 @@ export function Auth(...roles: Role[]) {
 }
 ```
 
-使用 `@Auth() 自定义装饰器` 
+使用 `@Auth() 自定义装饰器`
 
 ```js
 @Get('users')

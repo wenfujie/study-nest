@@ -118,6 +118,11 @@ consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
 
 守卫是一个实现 `CanActivate` 接口的类，在触发路由前会先触发守卫。
 
+关于 `CanActivate` 返回值
+
+- 返回 true, 将处理用户调用。
+- 返回 false, 将忽略当前请求的处理。
+
 ```js
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';

@@ -549,7 +549,7 @@ const response = host.getArgByIndex(1);
 
 ### ExecutionContext 执行上下文
 
-> `ExecutionContext` ：继承了 `ArgumentsHost` ，提供当前线程运行信息。
+> `ExecutionContext` ：继承了 `ArgumentsHost` ，并提供当前线程运行信息。
 
 ```ts
 export interface ExecutionContext extends ArgumentsHost {
@@ -567,20 +567,26 @@ export interface ExecutionContext extends ArgumentsHost {
 
 `getClass` 返回当前控制器，`getHandler` 返回当前处理函数。
 
+```js
+@Controller('cats')
+export class CatsController {
+  @Post()
+  create() {}
+}
+```
+
+```js
+const methodKey = ctx.getHandler().name; // "create"
+const className = ctx.getClass().name; // "CatsController"
+```
+
 守卫和拦截器都会用到 `ExecutionContext`
 
 ```js
 // 守卫
 class JwtAuthGuard extends AuthGuard('jwt') {
   canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic) {
-      return true;
-    }
-    return super.canActivate(context);
+    // ...
   }
 }
 ```
@@ -593,6 +599,8 @@ class TransformInterceptor implements NestInterceptor {
   }
 }
 ```
+
+`getClass` 和 `getHandler` 高频的使用场景是结合反射 `Reflector` 来访问元数据，下文会介绍到
 
 ### 元数据和反射 Reflector
 
@@ -623,7 +631,7 @@ async create() {}
 
 **访问元数据**
 
-通过辅助类 `Reflector` 来访问元数据，框架内置该类开箱即用
+nest 内置辅助类 `Reflector` 来访问元数据
 
 ```js
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
@@ -641,7 +649,7 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-访问元数据的几种方式
+看个示例
 
 ```js
 @Roles('user')
@@ -653,7 +661,7 @@ export class CatsController {
 }
 ```
 
-访问 `create` 方法的元数据
+访问示例中 `create` 方法的元数据
 
 ```js
 // 根据装饰器
@@ -663,7 +671,7 @@ this.reflector.get(Roles, context.getHandler()); // ['admin']
 this.reflector.get<string[]>('roles', context.getHandler()); // ['admin']
 ```
 
-访问 `CatsController` 控制器的元数据
+访问示例中 `CatsController` 控制器的元数据
 
 ```js
 // 根据装饰器

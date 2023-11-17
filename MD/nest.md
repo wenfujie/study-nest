@@ -18,6 +18,10 @@
     - [例子2：记录状态](#例子2记录状态)
     - [结合管道使用](#结合管道使用)
     - [装饰器聚合](#装饰器聚合)
+  - [1.8应用上下文类](#18应用上下文类)
+    - [ArgumentsHost 程序处理参数](#argumentshost-程序处理参数)
+    - [ExecutionContext 执行上下文](#executioncontext-执行上下文)
+    - [元数据和反射 Reflector](#元数据和反射-reflector)
 - [2.其他](#2其他)
   - [2.1编程概念](#21编程概念)
     - [ioC 控制反转](#ioc-控制反转)
@@ -463,6 +467,226 @@ export function Auth(...roles: Role[]) {
 @Get('users')
 @Auth('admin')
 findAllUsers() {}
+```
+
+## 1.8应用上下文类
+
+> 应用上下文：应用指 `http应用` 、`websocket应用` 、`微应用` 等，通过 `ArgumentsHost` 类能判断当前所处应用，还能获取到请求的上下文信息如 request 、response、next
+
+这边只阐述在 `http应用` 下的用法。
+
+### ArgumentsHost 程序处理参数
+
+> ArgumentsHost：简单地抽象为处理程序参数。
+
+先看类型
+
+```ts
+export interface ArgumentsHost {
+  /**
+   * Returns the array of arguments being passed to the handler.
+   */
+  getArgs<T extends Array<any> = any[]>(): T;
+  /**
+   * Returns a particular argument by index.
+   * @param index index of argument to retrieve
+   */
+  getArgByIndex<T = any>(index: number): T;
+  /**
+   * Switch context to RPC.
+   * @returns interface with methods to retrieve RPC arguments
+   */
+  switchToRpc(): RpcArgumentsHost;
+  /**
+   * Switch context to HTTP.
+   * @returns interface with methods to retrieve HTTP arguments
+   */
+  switchToHttp(): HttpArgumentsHost;
+  /**
+   * Switch context to WebSockets.
+   * @returns interface with methods to retrieve WebSockets arguments
+   */
+  switchToWs(): WsArgumentsHost;
+  /**
+   * Returns the current execution context type (string)
+   */
+  getType<TContext extends string = ContextType>(): TContext;
+}
+```
+
+switchToRpc、switchToWs用来在微服务、websocket获取程序参数的，这边不赘述。
+
+**使用 `getType` 判断应用类型**
+
+```js
+// host: ArgumentsHost
+
+if (host.getType() === 'http') {
+} else if (host.getType() === 'rpc') {
+} else if (host.getType<GqlContextType>() === 'graphql') {
+}
+```
+
+在HTTP应用中，`ArgumentsHost` 封装了Express的[request, response, next] 数组，可通过以下方式获取
+
+方式一 `switchToHttp`（推荐）
+
+```js
+// host: ArgumentsHost
+const ctx = host.switchToHttp();
+const request = ctx.getRequest<Request>();
+const response = ctx.getResponse<Response>();
+```
+
+方式二 `getArgs`、`getArgByIndex`
+
+```js
+const [req, res, next] = host.getArgs();
+// 或
+const request = host.getArgByIndex(0);
+const response = host.getArgByIndex(1);
+```
+
+### ExecutionContext 执行上下文
+
+> `ExecutionContext` ：继承了 `ArgumentsHost` ，提供当前线程运行信息。
+
+```ts
+export interface ExecutionContext extends ArgumentsHost {
+  /**
+   * Returns the type of the controller class which the current handler belongs to.
+   */
+  getClass<T>(): Type<T>;
+  /**
+   * Returns a reference to the handler (method) that will be invoked next in the
+   * request pipeline.
+   */
+  getHandler(): Function;
+}
+```
+
+`getClass` 返回当前控制器，`getHandler` 返回当前处理函数。
+
+守卫和拦截器都会用到 `ExecutionContext`
+
+```js
+// 守卫
+class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) {
+      return true;
+    }
+    return super.canActivate(context);
+  }
+}
+```
+
+```js
+// 拦截器
+class TransformInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    // ...
+  }
+}
+```
+
+### 元数据和反射 Reflector
+
+> `元数据`：在类、类的属性、对象之上添加属性。
+
+在 nest中，使用 `@SetMetadata()` 装饰器为处理程序添加元数据。
+
+```js
+@Post()
+@SetMetadata('roles', ['admin'])
+async create() {}
+```
+
+例子中，为 `create` 方法添加了元数据 `roles: ['admin']` 。
+
+为了更好的复用以及类型安全，`@SetMetadata()` 通常会结合装饰器使用
+
+```js
+// 定义装饰器
+export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+```
+
+```js
+@Post()
+@Roles('admin')
+async create() {}
+```
+
+**访问元数据**
+
+通过辅助类 `Reflector` 来访问元数据，框架内置该类开箱即用
+
+```js
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {
+    super();
+  }
+  canActivate(ctx: ExecutionContext) {
+    const roles = this.reflector.get<string[]>('roles', ctx.getHandler());
+    return roles.includes('admin')
+  }
+}
+```
+
+访问元数据的几种方式
+
+```js
+@Roles('user')
+@Controller('cats')
+export class CatsController {
+  @Post()
+  @Roles('admin')
+  create() {}
+}
+```
+
+访问 `create` 方法的元数据
+
+```js
+// 根据装饰器
+this.reflector.get(Roles, context.getHandler()); // ['admin']
+
+// 根据元数据key
+this.reflector.get<string[]>('roles', context.getHandler()); // ['admin']
+```
+
+访问 `CatsController` 控制器的元数据
+
+```js
+// 根据装饰器
+this.reflector.get(Roles, context.getClass()); // ['user']
+
+// 根据元数据key
+this.reflector.get<string[]>('roles', context.getClass()); // ['user']
+```
+
+同时访问`create`方法和`CatsController` 控制器的元数据，并对结果进行组合
+
+```js
+// getAllAndOverride 会遍历第二个参数来获取元数据，并返回第一个非 undefined 的值
+this.reflector.getAllAndOverride<string[]>('roles', [
+  context.getHandler(),
+  context.getClass(),
+]); // ['admin']
+
+// getAllAndMerge 会遍历第二个参数来获取元数据，并返回所有结果
+const roles = this.reflector.getAllAndMerge<string[]>('roles', [
+  context.getHandler(),
+  context.getClass(),
+]); // ['user', 'admin']
 ```
 
 # 2.其他

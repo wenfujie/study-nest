@@ -18,6 +18,8 @@ model Course {
   id             Int              @id @default(autoincrement())
   title          String
   coverImage     String
+  createTime     DateTime         @default(now())
+  updateTime     DateTime         @updatedAt
   CoursesOnUsers CoursesOnUsers[]
   posts          Post[]
   menuItem       MenuItem[]       @relation("CourseToMenuItem")
@@ -32,8 +34,6 @@ model Post {
   courseId     Int
   course       Course         @relation(fields: [courseId], references: [id])
   PostsOnUsers PostsOnUsers[]
-
-  @@index([courseId], map: "Post_courseId_fkey")
 }
 
 model CoursesOnUsers {
@@ -43,7 +43,6 @@ model CoursesOnUsers {
   user     User   @relation(fields: [userId], references: [id])
 
   @@id([courseId, userId])
-  @@index([userId], map: "CoursesOnUsers_userId_fkey")
 }
 
 model PostsOnUsers {
@@ -54,7 +53,6 @@ model PostsOnUsers {
   user         User   @relation(fields: [userId], references: [id])
 
   @@id([postId, userId])
-  @@index([userId], map: "PostsOnUsers_userId_fkey")
 }
 
 model MenuItem {
@@ -64,6 +62,4 @@ model MenuItem {
   parent   MenuItem?  @relation("ChildToParent", fields: [parentId], references: [id], onDelete: Cascade)
   children MenuItem[] @relation("ChildToParent")
   course   Course[]   @relation("CourseToMenuItem")
-
-  @@index([parentId], map: "MenuItem_parentId_fkey")
 }

@@ -6,7 +6,9 @@
  */
 import { Controller, Post } from '@nestjs/common';
 import { User } from './user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('用户管理')
 @Controller('users')
 export class UsersController {
   @Post('GetUserInfo')

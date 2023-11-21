@@ -5,12 +5,18 @@
  * @Description:
  */
 import { Body, Controller, Post } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { ApiOperation } from '@nestjs/swagger';
+import { PrismaService } from '../prisma/prisma.service';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AddTypeDto, FindCourseListDto } from './menu-item.dto';
+import { MenuItemService } from './menu-item.service';
 
+@ApiTags('课程分类管理')
 @Controller('menuItem')
 export class MenuItemController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private menuItemService: MenuItemService,
+  ) {}
 
   @ApiOperation({ summary: '创建分类' })
   @Post('Add')
@@ -45,5 +51,17 @@ export class MenuItemController {
   delete(@Body() params: { id: number }) {
     const { id } = params;
     return this.prisma.menuItem.delete({ where: { id } });
+  }
+
+  @ApiOperation({ summary: '为课程添加分类' })
+  @Post('AddType')
+  addType(@Body() data: AddTypeDto) {
+    return this.menuItemService.addCourses(data);
+  }
+
+  @ApiOperation({ summary: '根据分类id，获取课程列表' })
+  @Post('GetCoursesById')
+  GetCoursesById(@Body() data: FindCourseListDto) {
+    return this.menuItemService.getCourseList(data.menuId);
   }
 }

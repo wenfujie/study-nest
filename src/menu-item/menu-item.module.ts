@@ -6,10 +6,10 @@
  */
 import { Module } from '@nestjs/common';
 import { MenuItemController } from './menu-item.controller';
-import { PrismaService } from '../prisma.service';
+import { MenuItemService } from './menu-item.service';
 
 @Module({
   controllers: [MenuItemController],
-  providers: [PrismaService],
+  providers: [MenuItemService],
 })
 export class MenuItemModule {}

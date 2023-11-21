@@ -13,7 +13,7 @@ import {
   UpdatePostDto,
 } from './posts.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { XPageDTO } from '../common/common.dto';
+import { XPageDTO } from '../common/dtos/index';
 
 @ApiTags('文章管理')
 @Controller('posts')

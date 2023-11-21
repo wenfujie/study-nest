@@ -7,7 +7,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Post } from '@prisma/client';
-import { PageResultPromise } from '../common/common.dto';
+import { PageResultPromise } from '../common/dtos/index';
 import { CreatePostDto, DeleteBatchDto, UpdatePostDto } from './posts.dto';
 
 @Injectable()

@@ -29,6 +29,7 @@ model Post {
   id           Int            @id @default(autoincrement())
   title        String
   content      String?
+  author1      String?        @db.VarChar(50)
   createTime   DateTime       @default(now())
   updateTime   DateTime       @updatedAt
   courseId     Int

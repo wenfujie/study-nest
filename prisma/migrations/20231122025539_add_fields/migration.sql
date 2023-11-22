@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Post` ADD COLUMN `author1` VARCHAR(191) NULL;

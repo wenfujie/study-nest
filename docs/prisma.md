@@ -10,7 +10,12 @@
       - [隐式多对多](#隐式多对多)
       - [显示、隐式（多对多）使用场景区分](#显示隐式多对多使用场景区分)
     - [参照动作](#参照动作)
-- [常用指令](#常用指令)
+- [指令](#指令)
+  - [Prisma Migrate](#prisma-migrate)
+    - [初始化、新增、编辑模型](#初始化新增编辑模型)
+    - [更新 PRO](#更新-pro)
+    - [重置数据库](#重置数据库)
+    - [基线版本](#基线版本)
 
 # prisma.scheme
 
@@ -187,26 +192,71 @@ model Category {
 
 [参照动作](https://prisma.yoga/concepts/components/prisma-schema/relations/referential-actions)
 
-# 常用指令
+# 指令
 
-**dev 环境**
+## Prisma Migrate
+
+`Prisma Migrate` 是 prisma 的数据库迁移工具，用于将 `schema.prisma` 模型结构同步到数据库表结构。
+
+### 初始化、新增、编辑模型
+
+在 `prisma/schema.prisma` 中编辑好 model 后，执行以下指令即可开始同步模型到数据库。
 
 ```bash
-# 同步表结构（修改 scheme 时使用），确认无误再执行迁移指令
-npx prisma db push
+# --name 指定迁移记录文件夹名称，便于查看
+npx prisma migrate dev --name init-db
 ```
 
 ```bash
-# 同步数据库（--name 指定文件夹名称）
-npx prisma migrate dev --name init
+# --create-only 只生成迁移文件不自动执行，可人为进行修改sql文件，修改后再 migrate dev 应用
+npx prisma migrate dev --name init-db --create-only
+```
 
-# 重置数据库（自动运行种子脚本）
+prisma 会执行以下任务
+
+- 比对 `schema.prisma` 和数据库的差异，生成了 SQL 语句存放在 `prisma/migrations`
+- Prisma 执行这些 SQL 语句来更新数据库，进行了具体的建表、改表等操作
+- Prisma Client 重新生成新模型的操作 API
+
+### 更新 PRO
+
+```bash
+npx prisma migrate deploy
+```
+
+`migrate deploy` 用于更新生产数据库，它不会生成 SQL 文件，它负责找到未执行的迁移文件并运行 SQL 语句。
+
+这里 `未执行的迁移文件` 指的是开发环境 `migrate dev` 生成的迁移记录文件。
+
+Prisma 会执行以下任务
+
+- 找到尚未执行的迁移文件，并运行里面的SQL语句来更新数据库 schema
+- 迁移完成后可以重新启动相关服务
+- 下次部署时，`migrate deploy` 会自动忽略已迁移文件
+
+### 重置数据库
+
+一般在 dev 环境使用，会清空数据库的数据。
+
+```bash
 npx prisma migrate reset
 ```
 
-pro 环境
+Prisma 会执行以下任务
+
+- 删除数据库中所有由Prisma Migrate创建的表
+- 删除\_Migration表，这是Prisma Migrate内部用来记录迁移历史的表
+- 重新创建并初始化\_Migration表
+
+### 基线版本
+
+`基线版本(Baselining) ` 用于告诉 Prisma Migrate 某些迁移 `已经被执行过` 需跳过它们。
 
 ```bash
-# 同步数据库
-npx prisma migrate deploy
+npx prisma migrate resolve --applied 20210426141759_initial-migration-for-db
 ```
+
+该命令将目标迁移添加到_prisma_migrations表中，并将其标记为已应用。当你运行prisma migrate deploy来应用新的迁移时，Prisma Migrate 会：
+
+- 跳过所有标记为 "应用" 的迁移，包括 基线版本(baseline) 迁移。
+- 应用所有 基线版本(baseline) 迁移 后面 的新迁移。

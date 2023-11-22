@@ -189,7 +189,12 @@ model Category {
 
 # 常用指令
 
-dev 环境
+**dev 环境**
+
+```bash
+# 同步表结构（修改 scheme 时使用），确认无误再执行迁移指令
+npx prisma db push
+```
 
 ```bash
 # 同步数据库（--name 指定文件夹名称）
@@ -197,7 +202,6 @@ npx prisma migrate dev --name init
 
 # 重置数据库（自动运行种子脚本）
 npx prisma migrate reset
-
 ```
 
 pro 环境

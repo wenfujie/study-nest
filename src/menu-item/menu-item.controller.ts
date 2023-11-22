@@ -60,7 +60,7 @@ export class MenuItemController {
   }
 
   @ApiOperation({ summary: '根据分类id，获取课程列表' })
-  @Post('GetCoursesById')
+  @Post('QueryCourses')
   GetCoursesById(@Body() data: FindCourseListDto) {
     return this.menuItemService.getCourseList(data.menuId);
   }

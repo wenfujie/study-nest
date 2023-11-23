@@ -10,6 +10,7 @@ datasource db {
 model User {
   id             String           @id @default(cuid())
   name           String
+  password       String
   CoursesOnUsers CoursesOnUsers[]
 }
 
@@ -25,13 +26,13 @@ model Course {
 }
 
 model Post {
-  id           Int            @id @default(autoincrement())
-  title        String
-  content      String?
-  createTime   DateTime       @default(now())
-  updateTime   DateTime       @updatedAt
-  courseId     Int
-  course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String?
+  createTime DateTime @default(now())
+  updateTime DateTime @updatedAt
+  courseId   Int
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model CoursesOnUsers {

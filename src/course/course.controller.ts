@@ -9,11 +9,13 @@ import { CourseService } from './course.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   AddCourseDto,
+  AuthCoursesDto,
   DeleteBatchDto,
   QueryDetailDto,
   UpdateDto,
 } from './course.dto';
 import { XPageDTO } from '../common/dtos';
+import { User } from '../users/user.decorator';
 
 @ApiTags('课程管理')
 @Controller('course')
@@ -22,10 +24,11 @@ export class CourseController {
 
   @ApiOperation({ summary: '获取课程列表' })
   @Post('Query')
-  findAll(@Body() body: XPageDTO) {
+  findAll(@User() user, @Body() body: XPageDTO) {
     const { page = 1, pageSize = 10 } = body;
 
     return this.courseService.findAll({
+      userId: user.id,
       take: pageSize,
       skip: (page - 1) * pageSize,
     });
@@ -53,5 +56,11 @@ export class CourseController {
   @Post('Update')
   update(@Body() data: UpdateDto) {
     return this.courseService.update(data);
+  }
+
+  @ApiOperation({ summary: '为用户分配课程访问权限' })
+  @Post('AuthCourses')
+  authCourses(@Body() data: AuthCoursesDto) {
+    return this.courseService.authCourses(data);
   }
 }

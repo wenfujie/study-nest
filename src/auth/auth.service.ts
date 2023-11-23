@@ -5,8 +5,9 @@
  * @Description:
  */
 import { Injectable } from '@nestjs/common';
-import { UsersService, User } from '../users/users.service';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { JwtJson } from './types';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
   async validateUser(
     username: string,
     password: string,
-  ): Promise<null | Omit<User, 'password'>> {
+  ): Promise<null | JwtJson> {
     const user = await this.usersService.findOne(username);
     if (user && user.password === password) {
       delete user.password;
@@ -27,10 +28,9 @@ export class AuthService {
     return null;
   }
 
-  async login(user: User) {
-    const payload = { username: user.username, sub: user.userid };
+  async login(user: { name: string; id: string }) {
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(user),
     };
   }
 }

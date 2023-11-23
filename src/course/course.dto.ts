@@ -34,3 +34,13 @@ export class UpdateDto extends PartialType(AddCourseDto) {
   @IsNotEmpty({ message: '课程id不能为空' })
   id: number;
 }
+
+export class AuthCoursesDto {
+  @ApiProperty({ description: '用户id' })
+  @IsNotEmpty({ message: '用户id不能为空' })
+  userId: string;
+
+  @ApiProperty({ description: '课程id集合' })
+  @ArrayMinSize(1, { message: '课程id不能为空' })
+  courseIds: number[];
+}

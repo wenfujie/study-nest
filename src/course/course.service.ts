@@ -6,7 +6,12 @@
  */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AddCourseDto, DeleteBatchDto, UpdateDto } from './course.dto';
+import {
+  AddCourseDto,
+  AuthCoursesDto,
+  DeleteBatchDto,
+  UpdateDto,
+} from './course.dto';
 import { PageResultPromise } from '../common/dtos';
 import { Course } from '@prisma/client';
 
@@ -15,16 +20,23 @@ export class CourseService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: {
+    userId: string;
     skip?: number;
     take?: number;
   }): PageResultPromise<Course> {
-    const total = await this.prisma.course.count({});
-    const items = await this.prisma.course.findMany({
-      ...query,
-      orderBy: { createTime: 'desc' },
-      include: { posts: true },
+    const { userId, ...queryParam } = query;
+    const courses = await this.prisma.coursesOnUsers.findMany({
+      where: { userId },
+      select: {
+        course: {
+          include: { posts: true },
+        },
+      },
+      orderBy: { course: { createTime: 'desc' } },
+      ...queryParam,
     });
-    return { items, total };
+    const items = courses.map(({ course }) => course);
+    return { items, total: 0 };
   }
 
   findOne(id: number) {
@@ -49,6 +61,20 @@ export class CourseService {
     await this.prisma.course.update({
       where: { id },
       data: updateData,
+    });
+  }
+
+  async authCourses(data: AuthCoursesDto) {
+    const { courseIds, userId } = data;
+    const courseObjIds = courseIds.map((courseId) => ({ courseId }));
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        CoursesOnUsers: {
+          createMany: { data: courseObjIds },
+        },
+      },
     });
   }
 }

@@ -8,6 +8,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AddUserDto } from './user.dto';
 import { UsersService } from './users.service';
+import { User } from './user.decorator';
 
 @ApiTags('用户管理')
 @Controller('users')
@@ -16,8 +17,8 @@ export class UsersController {
 
   @Post('QueryUserInfo')
   //通过 @User 获取用户信息
-  getUser() {
-    return;
+  getUser(@User() user) {
+    return user;
   }
 
   @Post('Add')

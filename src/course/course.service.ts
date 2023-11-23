@@ -66,15 +66,10 @@ export class CourseService {
 
   async authCourses(data: AuthCoursesDto) {
     const { courseIds, userId } = data;
-    const courseObjIds = courseIds.map((courseId) => ({ courseId }));
+    const groupIdMap = courseIds.map((courseId) => ({ courseId, userId }));
 
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        CoursesOnUsers: {
-          createMany: { data: courseObjIds },
-        },
-      },
+    await this.prisma.coursesOnUsers.createMany({
+      data: groupIdMap,
     });
   }
 }

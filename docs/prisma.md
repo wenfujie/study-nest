@@ -16,6 +16,9 @@
     - [更新 PRO](#更新-pro)
     - [重置数据库](#重置数据库)
     - [基线版本](#基线版本)
+- [问题](#问题)
+  - [调用查询api，无法直接为列取别名](#调用查询api无法直接为列取别名)
+  - [用select过滤列，仅需剔除某个列时，也得将其他列一个个列置为true，效率很低](#用select过滤列仅需剔除某个列时也得将其他列一个个列置为true效率很低)
 
 # prisma.scheme
 
@@ -256,7 +259,13 @@ Prisma 会执行以下任务
 npx prisma migrate resolve --applied 20210426141759_initial-migration-for-db
 ```
 
-该命令将目标迁移添加到_prisma_migrations表中，并将其标记为已应用。当你运行prisma migrate deploy来应用新的迁移时，Prisma Migrate 会：
+该命令将目标迁移添加到\_prisma_migrations表中，并将其标记为已应用。当你运行prisma migrate deploy来应用新的迁移时，Prisma Migrate 会：
 
 - 跳过所有标记为 "应用" 的迁移，包括 基线版本(baseline) 迁移。
 - 应用所有 基线版本(baseline) 迁移 后面 的新迁移。
+
+# 问题
+
+## 调用查询api，无法直接为列取别名
+
+## 用select过滤列，仅需剔除某个列时，也得将其他列一个个列置为true，效率很低

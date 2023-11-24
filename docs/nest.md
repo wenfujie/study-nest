@@ -23,6 +23,7 @@
     - [ExecutionContext 执行上下文](#executioncontext-执行上下文)
     - [元数据和反射 Reflector](#元数据和反射-reflector)
 - [2.其他](#2其他)
+  - [JWT 授权流程](#jwt-授权流程)
   - [2.1编程概念](#21编程概念)
     - [ioC 控制反转](#ioc-控制反转)
     - [DTOs 限制参数类型](#dtos-限制参数类型)
@@ -698,6 +699,51 @@ const roles = this.reflector.getAllAndMerge<string[]>('roles', [
 ```
 
 # 2.其他
+
+## JWT 授权流程
+
+无token：
+
+1. 响应路由 auth/login ，触发守卫 AuthGuard('local')
+2. 守卫逻辑：自动调用 LocalStrategy.validate => 校验账号密码，返回用户信息。会自动将用户设置到 request.user
+3. 触发 auth/login 的处理函数：通过 @nestjs/jwt 包生成 access_token 并响应给用户
+
+有token：
+
+1. 调用任意接口，触发全局守卫 AuthGuard('jwt')
+2. 守卫逻辑：自动调用 JwtStrategy.validate ，自动判断token有效性并将用户设置到 request.user
+3. 触发接口处理函数
+
+`AuthGuard('jwt')` 内部实现，[源码地址](https://github.com/nestjs/passport/blob/master/lib/auth.guard.ts)
+
+```js
+export class AuthGuard implements CanActivate {
+  constructor(private jwtService: JwtService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const token = this.extractTokenFromHeader(request);
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: jwtConstants.secret,
+      });
+
+      request['user'] = payload;
+    } catch {
+      throw new UnauthorizedException();
+    }
+    return true;
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
+}
+```
 
 ## 2.1编程概念
 

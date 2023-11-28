@@ -16,6 +16,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RedisCacheModule } from './db/redis-cache.module';
 import { CourseModule } from './course/course.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { CustomHttpModule } from './common/http-module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PrismaModule } from './prisma/prisma.module';
     RedisCacheModule,
     CourseModule,
     PrismaModule,
+    CustomHttpModule,
   ],
   controllers: [AppController],
   providers: [

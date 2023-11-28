@@ -27,6 +27,7 @@
   - [2.1编程概念](#21编程概念)
     - [ioC 控制反转](#ioc-控制反转)
     - [DTOs 限制参数类型](#dtos-限制参数类型)
+    - [AOP 面向切面编程](#aop-面向切面编程)
   - [2.2规范](#22规范)
     - [从文件夹的index导入类，而不是各个文件](#从文件夹的index导入类而不是各个文件)
   - [2.3CLI](#23cli)
@@ -758,6 +759,16 @@ nestJS结合了 OOP （面向对象编程）、FP （函数式编程）和 FRP �
 DTOs 即数据传输对象，有点类似 ts 的 interface
 
 ![](https://resource5-1255303497.file.myqcloud.com/points_mall/picture/img_121184958_1630305485.png)
+
+### AOP 面向切面编程
+
+> AOP：Aspect Oriented Programming 的缩写，意为：面向切面编程
+
+作用：在程序运行期间，在不修改源码的情况下对方法进行功能增强
+
+优势：减少重复代码，提高开发效率，并且便于维护
+
+nestJS 通过 AOP 思想，引入了 `过滤器filter、守卫guard、拦截器interceptor、管道Pipe和中间件middleware` 
 
 ## 2.2规范
 

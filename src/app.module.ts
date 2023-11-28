@@ -13,10 +13,10 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { RedisCacheModule } from './db/redis-cache.module';
+import { RedisCacheModule } from './common/db/redis-cache.module';
 import { CourseModule } from './course/course.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { CustomHttpModule } from './common/http-module';
+import { CustomHttpModule } from './common/http.module';
 
 @Module({
   imports: [

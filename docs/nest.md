@@ -23,15 +23,17 @@
     - [ExecutionContext 执行上下文](#executioncontext-执行上下文)
     - [元数据和反射 Reflector](#元数据和反射-reflector)
 - [2.其他](#2其他)
+  - [swagger 文档编写](#swagger-文档编写)
+    - [类型转换 PartialType、PickType、OmitType、IntersectionType](#类型转换-partialtypepicktypeomittypeintersectiontype)
   - [JWT 授权流程](#jwt-授权流程)
-  - [2.1编程概念](#21编程概念)
+  - [编程概念](#编程概念)
     - [ioC 控制反转](#ioc-控制反转)
     - [DTOs 限制参数类型](#dtos-限制参数类型)
     - [AOP 面向切面编程](#aop-面向切面编程)
-  - [2.2规范](#22规范)
+  - [规范](#规范)
     - [从文件夹的index导入类，而不是各个文件](#从文件夹的index导入类而不是各个文件)
-  - [2.3CLI](#23cli)
-  - [2.4部署](#24部署)
+  - [CLI](#cli)
+  - [部署](#部署)
 
 # 1.核心模块
 
@@ -701,6 +703,92 @@ const roles = this.reflector.getAllAndMerge<string[]>('roles', [
 
 # 2.其他
 
+## swagger 文档编写
+
+`@nestjs/swagger` 提供很多装饰器辅助我们编写 swagger 文档。
+
+```js
+// Controller
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+@ApiBearerAuth()
+@ApiTags('待办事项')
+@Controller('todo')
+export class TodoController {
+  @ApiResponse({ type: PersonDTO })
+  @ApiOperation({ summary: '新增' })
+  @Post()
+  create(@Body() person: PersonDTO) {}
+}
+```
+
+- `ApiBearerAuth`：为控制器或接口启动token验证，可在文档上操作添加头部 token 。
+- `ApiTags`：分类标签。
+- `ApiResponse`：接口响应类型描述
+- `ApiOperation`：接口功能描述。
+- `@Body,@Query,@Param`：swagger 还会解析这些装饰器对应的 dto 来生成文档。
+
+```js
+// dto
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+class CreateTodoDto {
+  @ApiProperty({ description: '标题' })
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiPropertyOptional({ description: '描述' })
+  description?: string;
+}
+```
+
+**`ApiProperty`**：描述必填属性
+
+1. type 类型
+2. required 是否必填，默认true
+3. description 描述
+4. default 默认值
+5. name 重命名字段名称，文档中按照这个name的value为最终输入值
+
+**`ApiPropertyOptional`**：描述可选属性
+
+参数参考 `ApiProperty` ，required 默认为 false 。
+
+### 类型转换 PartialType、PickType、OmitType、IntersectionType
+
+这几个函数类似ts的类型工具，它们的作用是基于实体类型创建变体。
+
+- `PartialType` 函数返回一个类型(类)将输入的所有属性配置为可选的。
+- `PickType` 函数从输入类型中拾取一部分属性并生成一个新类型(类) 。
+- `OmitType` 移除输入类型指定部分属性，返回剩下属性的新类型。
+- `IntersectionType` 函数将两个类型组合为一个新类型（类）。
+
+```js
+import { PickType, OmitType, PartialType, IntersectionType } from '@nestjs/swagger';
+
+class UpdateCatDto extends PartialType(CreateCatDto) {}
+
+class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {}
+
+class UpdateCatDto extends OmitType(CreateCatDto, ['name'] as const) {}
+
+class UpdateCatDto extends IntersectionType(
+  CreateCatDto,
+  AdditionalCatInfo,
+) {}
+
+
+```
+
+组合使用
+
+```js
+class UpdateCatDto extends PartialType(
+  OmitType(CreateCatDto, ['name'] as const),
+) {}
+```
+
 ## JWT 授权流程
 
 无token：
@@ -746,7 +834,7 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-## 2.1编程概念
+## 编程概念
 
 nestJS结合了 OOP （面向对象编程）、FP （函数式编程）和 FRP （函数响应式编程）。
 
@@ -768,13 +856,13 @@ DTOs 即数据传输对象，有点类似 ts 的 interface
 
 优势：减少重复代码，提高开发效率，并且便于维护
 
-nestJS 通过 AOP 思想，引入了 `过滤器filter、守卫guard、拦截器interceptor、管道Pipe和中间件middleware` 
+nestJS 通过 AOP 思想，引入了 `过滤器filter、守卫guard、拦截器interceptor、管道Pipe和中间件middleware`
 
-## 2.2规范
+## 规范
 
 ### 从文件夹的index导入类，而不是各个文件
 
-## 2.3CLI
+## CLI
 
 用指令生成模块文件
 
@@ -790,7 +878,7 @@ nest g co posts
 nest g service posts
 ```
 
-## 2.4部署
+## 部署
 
 1.ci 打包
 

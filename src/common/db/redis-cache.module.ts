@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-11
  * @LastEditors: wfj
- * @LastEditTime: 2023-11
+ * @LastEditTime: 2023-12
  * @Description:
  */
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -16,7 +16,7 @@ import { redisStore } from 'cache-manager-redis-store';
     // nest10 使用新注册方式
     CacheModule.registerAsync({
       isGlobal: true,
-      imports: [ConfigModule],
+      imports: [ConfigModule.forRoot()],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         return {

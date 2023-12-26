@@ -9,7 +9,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 export const CustomHttpModule = HttpModule.registerAsync({
-  imports: [ConfigModule],
+  imports: [ConfigModule.forRoot()],
   useFactory: async (configService: ConfigService) => ({
     // 覆盖axios配置
     timeout: configService.get('HTTP_TIMEOUT'),
